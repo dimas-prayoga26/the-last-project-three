@@ -1,0 +1,168 @@
+/* =====================================================================
+   The Latest Project: brand tokens v2
+   Source: public/TheLatestProject_BrandGuidelines.pdf (32 pages, 1920 x 1080,
+   Adobe Illustrator 27.8, saved 2026-09-14). 1 pt in the deck = 1 px at 1920 wide.
+   [PDF] = measured or stated in the guidelines.  [REC] = web recommendation.
+   Brand name in the PDF is always "The Latest Project" (never "The Last Project").
+
+   Changes from brand-tokens.css (v1):
+    1. Font stack: "Inter Tight" removed from the default stack (it is never loaded,
+       and is narrower than Creato Display). Added a size-matched local fallback face.
+    2. @font-face: OTF fallback src added; licence note corrected (SIL OFL 1.1 with
+       Reserved Font Name "Creato Display": do not subset or rename; ship OFL.txt).
+    3. Opacity roles added (100 / 75 / 50 / 25 / 12.5 %): the deck builds every grey
+       from black or white at these opacities.
+    4. Line tokens split: the running corner mark on black content pages is white
+       75 % (#BFBFBF; 50 % on divider pages), the large outline logomark on black is
+       white 50 % (#808080); on white both are black 25 % (#BFBFBF). v1 used #808080
+       for both on black.
+    5. #DFDFDF flagged as a derived tint (page 6 only), not one of the 5 brand colours.
+    6. Added: hero size (cover title fitted to the full content width), per-role
+       weights, justified body alignment, content top line, stroke weights,
+       social-card (1080 x 1350) grid and type, logo unit / clear space / minimum
+       sizes, 3- and 4-column grids, shape aspect ratios.
+    7. Clear space: the text says 5x, the page-8 drawing measures 4x (103 px at
+       x = 25.75 px). Tokens use 5x (the stated rule).
+   ===================================================================== */
+
+/* ---------- Typeface [PDF]: Creato Display, (c) 2021 Anugrah Pasau (Lafontype).
+   Licence [web]: SIL Open Font License 1.1, Reserved Font Name "Creato Display".
+   Self-host. Convert OTF -> WOFF2 losslessly (no subsetting, keep name/metadata
+   tables) so the RFN can stay; put OFL.txt next to the files. Weights used in the
+   deck: 300, 400, 500, 700, 800; 900 is listed on the typeface page. ---------- */
+@font-face { font-family: "Creato Display"; font-weight: 300; font-style: normal; font-display: swap;
+  src: url("/fonts/creato-display/CreatoDisplay-Light.woff2") format("woff2"), url("/fonts/creato-display/CreatoDisplay-Light.otf") format("opentype"); }
+@font-face { font-family: "Creato Display"; font-weight: 400; font-style: normal; font-display: swap;
+  src: url("/fonts/creato-display/CreatoDisplay-Regular.woff2") format("woff2"), url("/fonts/creato-display/CreatoDisplay-Regular.otf") format("opentype"); }
+@font-face { font-family: "Creato Display"; font-weight: 500; font-style: normal; font-display: swap;
+  src: url("/fonts/creato-display/CreatoDisplay-Medium.woff2") format("woff2"), url("/fonts/creato-display/CreatoDisplay-Medium.otf") format("opentype"); }
+@font-face { font-family: "Creato Display"; font-weight: 700; font-style: normal; font-display: swap;
+  src: url("/fonts/creato-display/CreatoDisplay-Bold.woff2") format("woff2"), url("/fonts/creato-display/CreatoDisplay-Bold.otf") format("opentype"); }
+@font-face { font-family: "Creato Display"; font-weight: 800; font-style: normal; font-display: swap;
+  src: url("/fonts/creato-display/CreatoDisplay-ExtraBold.woff2") format("woff2"), url("/fonts/creato-display/CreatoDisplay-ExtraBold.otf") format("opentype"); }
+@font-face { font-family: "Creato Display"; font-weight: 900; font-style: normal; font-display: swap;
+  src: url("/fonts/creato-display/CreatoDisplay-Black.woff2") format("woff2"), url("/fonts/creato-display/CreatoDisplay-Black.otf") format("opentype"); }
+
+/* Size-matched fallback [REC]. Creato Display Regular averages 0.99 x Arial width
+   (frequency-weighted a-z + space, from the PDF width tables); vertical metrics from
+   the PDF font descriptor: ascent 946, descent 206, cap 712, x-height 516 (per 1000). */
+@font-face { font-family: "Creato Display Fallback"; src: local("Arial"), local("ArialMT"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 99%; ascent-override: 95.6%; descent-override: 20.8%; line-gap-override: 0%; }
+
+:root {
+  /* ---------- Palette [PDF p15]: the only allowed colours ---------- */
+  --tlp-black:       #000000; /* Black        RGB 0, 0, 0       */
+  --tlp-dark-grey:   #404040; /* Dark Grey    RGB 64, 64, 64    = black 75 % on white, white 25 % on black */
+  --tlp-medium-grey: #808080; /* Medium Grey  RGB 128, 128, 128 = black 50 % on white, white 50 % on black */
+  --tlp-light-grey:  #BFBFBF; /* Light Grey   RGB 191, 191, 191 = black 25 % on white, white 75 % on black */
+  --tlp-white:       #FFFFFF; /* White        RGB 255, 255, 255 */
+  --tlp-tint-12:     #DFDFDF; /* DERIVED, not a brand colour: black 12.5 % on white (page-6 grid panel only) */
+  --tlp-panel:       var(--tlp-tint-12); /* v1 alias */
+
+  /* Opacity roles [PDF] (apply to black on white, white on black) */
+  --tlp-alpha-primary:   1;     /* headings, titles, folio section name, captions */
+  --tlp-alpha-strong:    .75;   /* running corner logomark outline on black content pages (white 75 %; 50 % on divider pages) */
+  --tlp-alpha-secondary: .5;    /* body/side text, About text, social URL + heading, social logomark */
+  --tlp-alpha-tertiary:  .25;   /* folio "Chapter n — Page nn", corner mark on white, outlines on white, diagram labels */
+  --tlp-alpha-tint:      .125;  /* page-6 panel only */
+
+  /* Semantic, light ground (white) */
+  --tlp-bg:            var(--tlp-white);
+  --tlp-fg:            var(--tlp-black);        /* 21:1 */
+  --tlp-fg-secondary:  var(--tlp-medium-grey);  /* [PDF] 50 %; 3.95:1 on white = AA only for >= 24 px (or >= 18.66 px bold) */
+  --tlp-fg-body:       var(--tlp-dark-grey);    /* [REC] long-form text on white, 10.37:1 */
+  --tlp-fg-tertiary:   var(--tlp-light-grey);   /* [PDF] folio; 1.84:1, decorative or non-essential only */
+  --tlp-line:          var(--tlp-light-grey);   /* [PDF] black 25 %: outline logomark, hairlines */
+  --tlp-line-strong:   var(--tlp-light-grey);   /* [PDF] corner mark on white = black 25 % */
+  --tlp-fg-muted:      var(--tlp-fg-secondary); /* v1 alias */
+  --tlp-fg-faint:      var(--tlp-fg-tertiary);  /* v1 alias */
+
+  /* ---------- Typography [PDF] ---------- */
+  --tlp-font: "Creato Display", "Creato Display Fallback", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --tlp-leading: 1.2;            /* every text block in the deck: leading = 1.2 x size */
+  --tlp-tracking: 0;             /* Tc = 0 everywhere; Illustrator metric kerning on -> font-kerning: normal */
+  --tlp-text-align-body: justify;/* [PDF] all paragraphs are justified, last line left; [REC] left-align below 768 px */
+  --tlp-w-light: 300; --tlp-w-regular: 400; --tlp-w-medium: 500;
+  --tlp-w-bold: 700;  --tlp-w-extrabold: 800; --tlp-w-black: 900;
+
+  /* Sizes in px at 1920 wide, fluid (vw = px / 19.2); minimums are [REC] */
+  --tlp-fs-hero:    clamp(4rem,      13.889vw,  16.667rem); /* 266.67 cover title "Brand Guidelines", Regular, fitted to 1870 px */
+  --tlp-fs-display: clamp(3.5rem,    9.375vw,   11.25rem);  /* 180 section titles, Regular, no final period */
+  --tlp-fs-h1:      clamp(2rem,      3.125vw,   3.75rem);   /*  60 "Contents." Medium; index numerals Light */
+  --tlp-fs-lead:    clamp(1.5rem,    2.5vw,     3rem);      /*  48 About text, Regular at 50 %, Bold lead-in */
+  --tlp-fs-h2:      clamp(1.375rem,  1.875vw,   2.25rem);   /*  36 side headings Medium (end with "."); closing text Regular; diagram labels Light/Regular */
+  --tlp-fs-caption: clamp(1.0625rem, 1.25vw,    1.5rem);    /*  24 captions Regular; "Do not" ExtraBold */
+  --tlp-fs-small:   clamp(1rem,      1.09375vw, 1.3125rem); /*  21 side text Regular 50 %; folio Light */
+  --tlp-w-hero: 400; --tlp-w-display: 400; --tlp-w-h1: 500; --tlp-w-h2: 500;
+  --tlp-w-lead: 400; --tlp-w-caption: 400; --tlp-w-small: 400; --tlp-w-folio: 300;
+
+  /* ---------- Layout [PDF] (1920 x 1080 canvas) ---------- */
+  --tlp-unit: clamp(16px, 1.302vw, 25px);    /* 25 px base: margin = gutter = panel padding */
+  --tlp-margin: var(--tlp-unit);             /* outer margin, all sides */
+  --tlp-gutter: var(--tlp-unit);             /* gutters between cards, shapes, columns */
+  --tlp-sidebar: 15.625vw;                   /* 300 px side column (25..325); main panel 350..1895 */
+  --tlp-content-top: 5.208vw;                /* 100 px: cap-top line of headings and first text */
+  --tlp-mark-w: 75px; --tlp-mark-h: 25px;    /* running outline logomark at (25, 25), 0.5 px stroke */
+  --tlp-cols-3: 3;                           /* imagery grid: 3 x 606.67 + 2 x 25 = 1870 */
+  --tlp-cols-4: 4;                           /* shape grid: 4 x 355 + 3 x 25 = 1495 (inside 25 px panel padding) */
+  --tlp-card-ratio: 4 / 5;                   /* social / editorial cards 606.67 x 758.33 = 1080 x 1350 */
+  --tlp-ratio-logo: 3 / 1;
+  --tlp-ratio-shape: 1 / 1;
+  --tlp-stroke-hair: 0.5px;  /* corner logomark (render 1px + opacity on 1x screens) */
+  --tlp-stroke-1: 1px;       /* outline shapes, outline logomark, big divider outline */
+  --tlp-stroke-2: 2px;       /* construction outline, numbered circles */
+  --tlp-stroke-3: 3px;       /* concept diagram (page 6) */
+
+  /* ---------- Logo [PDF] ---------- */
+  /* 24 x 8 module grid; x = logo width / 24. Logotype = Creato Display Regular,
+     cap height 1.689x, size 2.372x, leading 1.2, two lines "The Latest / Project",
+     inset 1x from left and top. Use the vector master only (never re-typeset). */
+  --tlp-logo-clear: 5;                         /* clear space in x on every side (stated) */
+  --tlp-logo-min-w: 120px;                     /* [REC] primary logo (type ~12 px) */
+  --tlp-logomark-min-w: 48px;                  /* [REC] logo icon (2 px per module) */
+
+  /* ---------- Social card grid [PDF pages 24-31], values at 1080 x 1350 ---------- */
+  --tlp-social-w: 1080px; --tlp-social-h: 1350px;
+  --tlp-social-margin: 40px;                   /* side margin, column gutter, image-to-text gap */
+  --tlp-social-top-band: 93px;                 /* URL band; image band / text starts here */
+  --tlp-social-bottom-band: 120px;             /* logomark band: 120 x 40 outline mark, 40 px from bottom */
+  --tlp-social-col: 480px;                     /* 2 columns: 40 | 480 | 40 | 480 | 40 */
+  --tlp-social-image-band: 1080px 607.5px;     /* 16:9 full-bleed band */
+  --tlp-social-fs-heading: 48px;               /* Regular, 50 %, centred */
+  --tlp-social-fs-title: 36px;                 /* Bold, 100 % */
+  --tlp-social-fs-body: 24px;                  /* Regular, 100 %, justified, 28.8 px leading */
+  --tlp-social-fs-url: 18px;                   /* Regular, 50 %, centred, baseline 52.8 px */
+
+  /* ---------- Shape clip-paths [PDF geometry]; element must keep the ratio above ---------- */
+  --tlp-clip-logomark: polygon(0 0, 62.5% 0, 62.5% 25%, 66.667% 25%, 66.667% 0, 100% 0, 100% 87.5%, 91.667% 87.5%, 91.667% 100%, 33.333% 100%, 33.333% 87.5%, 25% 87.5%, 25% 100%, 8.333% 100%, 8.333% 87.5%, 0 87.5%);
+  --tlp-clip-T:       polygon(0 0, 100% 0, 100% 87.5%, 75% 87.5%, 75% 100%, 25% 100%, 25% 87.5%, 0 87.5%);
+  --tlp-clip-T-right: polygon(0 0, 87.5% 0, 87.5% 25%, 100% 25%, 100% 75%, 87.5% 75%, 87.5% 100%, 0 100%);
+  --tlp-clip-T-up:    polygon(25% 0, 75% 0, 75% 12.5%, 100% 12.5%, 100% 100%, 0 100%, 0 12.5%, 25% 12.5%);
+  --tlp-clip-T-left:  polygon(12.5% 0, 100% 0, 100% 100%, 12.5% 100%, 12.5% 75%, 0 75%, 0 25%, 12.5% 25%);
+  --tlp-clip-L:       polygon(0 0, 87.5% 0, 87.5% 25%, 100% 25%, 100% 100%, 0 100%);
+  --tlp-clip-P-rot:   polygon(25% 0, 100% 0, 100% 100%, 0 100%, 0 12.5%, 25% 12.5%);
+  --tlp-clip-L-rot:   polygon(0 0, 100% 0, 100% 100%, 12.5% 100%, 12.5% 75%, 0 75%);
+  --tlp-clip-P:       polygon(0 0, 100% 0, 100% 87.5%, 75% 87.5%, 75% 100%, 0 100%);
+}
+
+/* Dark ground (black) [PDF] */
+.tlp-dark {
+  --tlp-bg: var(--tlp-black);
+  --tlp-fg: var(--tlp-white);
+  --tlp-fg-secondary: var(--tlp-medium-grey); /* white 50 %; 5.32:1, AA for body text */
+  --tlp-fg-body: var(--tlp-light-grey);       /* [REC] 11.42:1 */
+  --tlp-fg-tertiary: var(--tlp-dark-grey);    /* white 25 % folio; 2.03:1, decorative only */
+  --tlp-line: var(--tlp-medium-grey);         /* white 50 %: large outline logomark on divider pages */
+  --tlp-line-strong: var(--tlp-light-grey);   /* white 75 %: running corner logomark on content pages */
+  --tlp-fg-muted: var(--tlp-fg-secondary);
+  --tlp-fg-faint: var(--tlp-fg-tertiary);
+}
+
+/* Base text settings [PDF] */
+.tlp-type {
+  font-family: var(--tlp-font);
+  line-height: var(--tlp-leading);
+  letter-spacing: var(--tlp-tracking);
+  font-kerning: normal;
+  font-synthesis: none;
+}

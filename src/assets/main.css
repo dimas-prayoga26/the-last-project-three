@@ -1,0 +1,302 @@
+@import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
+@import './brand/brand-tokens.v2.css';
+
+/* Brand palette only (PDF p15): the default Tailwind colours are removed on purpose. */
+@theme {
+  --color-*: initial;
+  --color-black: #000000;
+  --color-grey-dark: #404040;
+  --color-grey-medium: #808080;
+  --color-grey-light: #bfbfbf;
+  --color-grey-tint: #dfdfdf;
+  --color-white: #ffffff;
+
+  --font-sans: 'Creato Display', 'Creato Display Fallback', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* Side margin of the page content. */
+  --spacing-page: clamp(16px, 4vw, 72px);
+}
+
+/* Fluid type scale, grid unit and card ratio from brand-tokens.v2.css. */
+@theme inline {
+  --text-hero: var(--tlp-fs-hero);
+  --text-hero--line-height: 1;
+  --text-display: var(--tlp-fs-display);
+  --text-display--line-height: 1;
+  --text-h1: var(--tlp-fs-h1);
+  --text-h1--line-height: 1.1;
+  --text-lead: var(--tlp-fs-lead);
+  --text-lead--line-height: 1.2;
+  --text-h2: var(--tlp-fs-h2);
+  --text-h2--line-height: 1.2;
+  --text-caption: var(--tlp-fs-caption);
+  --text-caption--line-height: 1.2;
+  --text-small: var(--tlp-fs-small);
+  --text-small--line-height: 1.2;
+
+  --spacing-unit: var(--tlp-unit);
+  --aspect-card: var(--tlp-card-ratio);
+}
+
+@layer base {
+  html {
+    font-kerning: normal;
+    -webkit-font-smoothing: antialiased;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-white font-sans text-black;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    @apply bg-black text-white;
+  }
+}
+
+@layer components {
+  .link-underline,
+  .menu-link {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0 1px;
+    transition: background-size 0.35s ease;
+  }
+
+  .link-underline:hover,
+  .menu-link:hover,
+  .menu-link:focus-visible,
+  .menu-link.is-active {
+    background-size: 100% 1px;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-3 bg-black px-6 py-3.5 text-base text-white transition-colors hover:bg-grey-dark disabled:cursor-wait disabled:opacity-60;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-3 border border-black px-6 py-3.5 text-base transition-colors hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-60;
+  }
+
+  /* Filter chips (works categories, home tabs, density toggle). */
+  .chip {
+    @apply inline-flex h-10 items-center gap-2 border border-black/20 px-4 text-sm whitespace-nowrap transition-colors hover:border-black;
+  }
+
+  .chip.is-active,
+  .chip[aria-pressed='true'],
+  .chip[aria-current='page'] {
+    @apply border-black bg-black text-white;
+  }
+
+  .icon-button {
+    @apply inline-flex size-11 items-center justify-center border border-black text-lg transition-colors hover:bg-black hover:text-white disabled:pointer-events-none disabled:opacity-25;
+  }
+
+  /* A small label with a leading square, used above titles. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-sm text-grey-dark;
+  }
+
+  .eyebrow::before {
+    @apply inline-block size-2 shrink-0 bg-black;
+    content: '';
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Route changes fade the page. */
+  .page-enter-active,
+  .page-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .page-enter-from,
+  .page-leave-to {
+    opacity: 0;
+  }
+
+  .field-label {
+    @apply text-sm text-grey-dark;
+  }
+
+  .field-input {
+    @apply w-full border border-black/20 bg-white px-4 py-3 text-base transition-colors outline-none placeholder:text-grey-medium focus:border-black;
+  }
+
+  .field-input[aria-invalid='true'] {
+    @apply border-dashed border-black;
+  }
+
+  .prose-body {
+    @apply flex flex-col gap-5 text-lg leading-relaxed text-grey-dark;
+  }
+
+  /*
+   * Brand shapes as image masks (see lib/shapes.ts). --shape-clip is the brand
+   * polygon, --shape-full the same polygon opened up to a full rectangle, so the
+   * two can animate into each other.
+   */
+  .shape {
+    clip-path: var(--shape-clip);
+  }
+
+  .shape-morph,
+  .shape-reveal {
+    transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  /* Full image that turns into the shape on hover. */
+  .shape-morph {
+    clip-path: var(--shape-full);
+  }
+
+  .group:hover .shape-morph,
+  .group:focus-visible .shape-morph {
+    clip-path: var(--shape-clip);
+  }
+
+  /* Shape that opens up to the full image on hover. */
+  .shape-reveal {
+    clip-path: var(--shape-clip);
+  }
+
+  .group:hover .shape-reveal,
+  .group:focus-visible .shape-reveal {
+    clip-path: var(--shape-full);
+  }
+
+  /*
+   * Hero mosaic: four square columns on wide screens (each row as tall as a
+   * column is wide), two columns on phones.
+   */
+  .mosaic-frame {
+    container-type: inline-size;
+  }
+
+  .mosaic {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--tlp-unit);
+  }
+
+  .mosaic > * {
+    aspect-ratio: 1;
+  }
+
+  .mosaic > .mosaic-text {
+    grid-column: span 2;
+    aspect-ratio: auto;
+  }
+
+  .mosaic > .mosaic-wide {
+    grid-column: span 2;
+    aspect-ratio: 3;
+  }
+
+  @media (width >= 64rem) {
+    .mosaic {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: calc((100cqw - 3 * var(--tlp-unit)) / 4);
+    }
+
+    .mosaic > *,
+    .mosaic > .mosaic-text,
+    .mosaic > .mosaic-wide {
+      aspect-ratio: auto;
+    }
+
+    .mosaic > .mosaic-wide {
+      grid-column: span 3;
+    }
+  }
+
+  /*
+   * Justified gallery: every item grows in proportion to its aspect ratio (--a),
+   * so the images of a row share one height and keep their shape. The ::after
+   * filler takes the leftover space so the last row is not stretched.
+   */
+  .justified {
+    --row-h: 8.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tlp-unit);
+  }
+
+  .justified::after {
+    content: '';
+    flex-grow: 9999;
+  }
+
+  .justified-item {
+    flex: var(--a) 1 calc(var(--a) * var(--row-h));
+  }
+
+  @media (width >= 40rem) {
+    .justified {
+      --row-h: 13rem;
+    }
+  }
+
+  @media (width >= 80rem) {
+    .justified {
+      --row-h: 17rem;
+    }
+  }
+
+  .marquee-track {
+    animation: marquee 45s linear infinite;
+  }
+
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee-track {
+    animation: none;
+  }
+}
